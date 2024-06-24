@@ -1,6 +1,3 @@
-require('dotenv').config();
-
-
 document.getElementById('searchButton').addEventListener('click', function() {
     const city = document.getElementById('city').value;
   if(city) {
@@ -9,22 +6,26 @@ document.getElementById('searchButton').addEventListener('click', function() {
 });
 
 function fetchWeather(city) {
-  const apiKey = process.env.API_KEY;
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-
-  fetch(apiUrl)
+  fetch('/api-key')
     .then(response => response.json())
-  .then(data => {
-      displayWeather(data);
-    })
-  .cath(error => {
-      console.error('God Knows What Happend, I could not get the data I am so sorry:', error);
-      alert('Not Working, Try Again!');
-    })
+    .then(data => {
+      const apiKey = data.apiKey;
+      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          displayWeather(data);
+        })
+        .cath(error => {
+          console.error('God Knows What Happend, I could not get the data I am so sorry:', error);
+          alert('Not Working, Try Again!');
+        });
+    });
 }
 
 function displayWeather(data) {
-  if(data.error) {
+  if(data.cod === '404') {
     alert('YOUR CITY IS NOT REAL');
     return;
   }
